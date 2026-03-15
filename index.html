@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>𝐀𝐒𝐈𝐀𝐗 𝐏𝐑𝐎 - Wealth Creation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: rgba(20, 30, 50, 0.8);
+      --glass: rgba(255,255,255,0.05);
+      --accent: #00d4ff;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4757;
+      --muted: #a0b0c0;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; font-family:'Inter',system-ui,sans-serif; }
+    body {
+      background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 50%, #0a0e1a 100%);
+      color: #e8f0ff;
+      padding-bottom: 20px;
+      overflow-x: hidden;
+    }
+    .app { max-width: 420px; margin: 0 auto; padding: 16px; }
+    
+    .topbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-bottom: 16px; backdrop-filter: blur(20px); background: rgba(10,14,26,0.8); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .custom-logo { width: 120px; height: 48px; object-fit: contain; background: transparent; border-radius: 0; box-shadow: none; }
+    .app-title { font-size: 1.2rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .status { padding: 12px; border-radius: 12px; text-align: center; font-size: 0.85rem; font-weight: 500; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .status.success { background: rgba(0,255,136,0.1); color: var(--success); border-color: var(--success); }
+    .status.error { background: rgba(255,71,87,0.1); color: var(--error); border-color: var(--error); }
+    
+    .card-app { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin-bottom: 16px; backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); animation: float 6s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+    
+    .stats-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat { flex: 1; padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 8px; min-width: 120px; border: 1px solid rgba(255,255,255,0.05); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .stat-value i { font-size: 1rem; color: var(--accent); }
+    
+    .btn-modern { border-radius: 16px; padding: 14px 20px; font-weight: 600; border: none; transition: all 0.3s; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #00ff88); color: #000; }
+    .btn-success { background: linear-gradient(135deg, var(--success), #00cc66); color: #000; }
+    .btn-warning { background: linear-gradient(135deg, var(--warning), #ff8800); color: #000; }
+    .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+    .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,255,0.4); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }.form-control { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; height: 48px; padding: 12px 16px; transition: all 0.3s; }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.2); outline: none; }
+    .form-control::placeholder { color: var(--muted); }
+    .input-group .form-control { border-radius: 12px 0 0 12px; }
+    .input-group .btn { border-radius: 0 12px 12px 0; }
+    
+    .timer-card { background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(169,169,0.1)); border: 1px solid #C0C0C0; animation: pulse-timer 2s infinite; }
+    .timer-display { font-size: 1.5rem; font-weight: 700; color: #C0C0C0; }
+    @keyframes pulse-timer { 0%,100%{box-shadow:0 0 0 0 rgba(192,192,192,0.4)} 50%{box-shadow:0 0 0 12px rgba(192,192,192,0)} }
+    
+    .bottom-nav { position: relative; left: 50%; transform: translateX(-50%); bottom: 16px; width: calc(100% - 32px); display: flex; gap: 12px; background: var(--glass); padding: 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); }
+    .nav-btn { flex: 1; padding: 14px; border-radius: 16px; background: transparent; border: none; color: var(--muted); }
+    .nav-btn.active { background: var(--accent); color: #000; }
+    .nav-btn:hover { background: rgba(0,212,255,0.2); color: var(--accent); }
+    
+    @media (max-width: 360px) { .app { padding: 12px; } .card-app { padding: 16px; } }
+    .small-text { font-size: 0.8rem; color: var(--muted); }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <img src="prologo.png" class="custom-logo" alt="ASIAX PRO" />
+      </div>
+      <button id="connectBtn" class="btn btn-modern btn-primary pulse">
+        <i class="fas fa-wallet"></i> <span id="connectLabel">Connect</span>
+      </button>
+    </div>
+
+    <div id="status" class="status">Ready — Connect Wallet</div>
+
+    <div class="card-app">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <div class="small-text">Welcome</div>
+          <div id="userAddress" style="font-weight:700;font-size:1.1rem">Not Connected</div>
+        </div>
+        <div class="text-end">
+          <div id="totalTeam" class="small-text mb-1">My Team: 0</div>
+          <button id="shareBtn" class="btn btn-sm btn-outline"><i class="fas fa-share-alt"></i></button>
+        </div>
+      </div>
+      
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-label">Total Invest</div>
+          <div class="stat-value"><i class="fas fa-coins"></i> <span id="totalInvest">0</span> AX</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Wallet Bal</div>
+          <div class="stat-value"><i class="fas fa-wallet"></i> <span id="walletBal">0</span> AX</div>
+        </div>
+      </div>
+      
+      <div class="stats-row mt-2">
+        <div class="stat">
+          <div class="stat-label">Total Income</div><div class="stat-value"><i class="fas fa-money-bill-wave"></i> <span id="totalWithdrawn">0</span> AX</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Pending ROI</div>
+          <div class="stat-value"><i class="fas fa-chart-line"></i> <span id="pendingROI">0</span> AX</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-app">
+      <div class="small-text mb-2">Income Breakdown</div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-label">Sponsor</div>
+          <div class="stat-value"><i class="fas fa-users"></i> <span id="sponsorInc">0</span> AX</div></div>
+        <div class="stat">
+          <div class="stat-label">Generation</div>
+          <div class="stat-value"><i class="fas fa-network-wired"></i> <span id="genInc">0</span> AX</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Pools</div>
+          <div class="stat-value"><i class="fas fa-trophy"></i> <span id="poolRewards">0</span> AX</div>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-3">
+        <button id="claimIncomeBtn" class="btn btn-modern btn-success flex-fill">Claim Income</button>
+        <button id="refreshBtn" class="btn btn-modern btn-outline flex-fill"><i class="fas fa-sync"></i></button>
+      </div>
+    </div>
+
+    <div id="timerCard" class="card-app timer-card" style="display:none;">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="small-text">Silver Pool Entry</div>
+          <div class="timer-display" id="timerDisplay">30:00:00</div>
+        </div>
+        <div><i class="fas fa-medal" style="font-size:2rem;color:var(--warning)"></i></div>
+      </div>
+      <div class="small-text mt-2">Join within 30 days of first investment</div>
+    </div>
+
+    <div class="card-app">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div><div class="small-text">Invest</div><div style="font-weight:700" id="investTitle">Join Network</div></div>
+        <i class="fas fa-hand-holding-usd" style="font-size:1.5rem;color:var(--accent)"></i>
+      </div>
+      <div class="mb-3">
+        <input id="referrerInput" class="form-control" placeholder="🔗 Referrer Address (Required)" />
+        <div id="referrerStatus" class="small-text mt-1"></div>
+      </div>
+      <div class="input-group mb-3">
+        <input id="investAmount" type="number" class="form-control" placeholder="Amount (AX)" />
+        <button id="maxBtn" class="btn btn-outline">MAX</button>
+      </div>
+      <button id="investBtn" class="btn btn-modern btn-primary w-100">
+        <i class="fas fa-rocket"></i> Invest Now
+      </button>
+    </div>
+
+    <div class="card-app">
+      <div class="d-flex gap-2">
+        <button id="withdrawBtn" class="btn btn-modern btn-success flex-fill">
+          <i class="fas fa-arrow-up"></i><br><small>Withdraw</small>
+        </button>
+        <button id="claimPoolsBtn" class="btn btn-modern btn-warning flex-fill">
+          <i class="fas fa-trophy"></i><br><small>Claim Pools</small>
+        </button>
+      </div>
+    </div>
+
+    <div class="card-app">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div><div class="small-text">Fast Withdraw</div><div style="font-weight:700">To Wallet</div></div>
+        <i class="fas fa-lightning-bolt" style="font-size:1.5rem;color:var(--success)"></i>
+      </div>
+      <div class="input-group">
+        <input id="withdrawAmt" type="number" class="form-control" placeholder="Amount (10-1000 AX)" />
+        <button id="walletWithdrawBtn" class="btn btn-success">GO</button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="nav-btn active" id="navHome"><i class="fas fa-home"></i></button>
+      <button class="nav-btn" id="navInvest"><i class="fas fa-bars"></i></button>
+      <button class="nav-btn" id="navPools"><i class="fas fa-coins"></i></button>
+      <button class="nav-btn" id="navTeam"><i class="fas fa-users"></i></button>
+    </div>
+  </div>
+
+<script>
+    // ================= CONFIG =================
+    const CONTRACT_ADDRESS = "0xF6d0d72AAf0Bbf5C459E680f1e6E75E3B1ce1f06";
+    const TOKEN_ADDRESS = "0xe36b5223d488322fac2ddda937e5ab226e83fbbd";
+    
+    // ✅ FIXED ABI - REMOVED creator() FUNCTION
+    const ABI = [
+      "function invest(address _referrer,uint256 _amount) external",
+      "function withdraw() external","function claimPoolRewards() external",
+      "function WalletWithdraw(uint256 _amount) external",
+      "function getUserIncome(address) view returns(uint256,uint256,uint256,uint256,uint256)",
+      "function getUserNetwork(address) view returns(uint256,uint256,bool,bool,bool)",
+      "function userBasic(address) view returns(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+      "function userWallet(address) view returns(uint256,uint256,uint256)",
+      "function totalUsers() view returns(uint256)",
+      "function calculatePendingROI(address) view returns(uint256)"
+    ];
+    
+    const TOKEN_ABI = [
+      "function balanceOf(address) view returns(uint256)",
+      "function approve(address,uint256) external returns(bool)",
+      "function allowance(address,address) view returns(uint256)",
+      "function decimals() view returns(uint8)"
+    ];
+
+    // ================= STATE =================
+    let provider, signer, contract, tokenContract, DECIMALS = 18;
+    let autoRefresh, timerInterval;
+    const REFRESH_INTERVAL = 20000;
+    const SILVER_DEADLINE = 30 * 24 * 60 * 60 * 1000;
+
+    // ================= HELPERS =================
+    function shortAddr(addr) { return addr ? `${addr.slice(0,6)}...${addr.slice(-4)}` : '—'; }
+    function formatNum(num) { return (num / 1e18).toFixed(2); }
+    function setStatus(text, type = '') {
+      const el = document.getElementById('status');
+      el.textContent = text;
+      el.className = `status ${type}`;
+    }
+    function disableBtn(id, disabled) { 
+      const btn = document.getElementById(id);
+      if (btn) btn.disabled = disabled; 
+    }
+
+    // ================= FIXED WALLET CONNECT =================
+    async function connectWallet() {
+      try {
+        setStatus('🔓 Requesting MetaMask...', '');
+        
+        if (typeof window.ethereum === 'undefined') {
+          throw new Error('MetaMask not found! Install from metamask.io');
+        }
+        
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        if (!accounts.length) throw new Error('No accounts found');
+        
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        const network = await provider.getNetwork();
+        
+        if (network.chainId !== 137) {
+          setStatus('🔄 Switching to Polygon...', '');
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x89' }]
+            });
+          } catch (switchError) {
+            if (switchError.code === 4902) {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: '0x89',
+                  chainName: 'Polygon Mainnet',
+                  rpcUrls: ['https://polygon-rpc.com'],
+                  nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+                  blockExplorerUrls: ['https://polygonscan.com']
+                }]
+              });
+            }
+          }
+        }
+        
+        contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+        tokenContract = new ethers.Contract(TOKEN_ADDRESS, TOKEN_ABI, signer);
+        DECIMALS = await tokenContract.decimals();
+        
+        const addr = await signer.getAddress();
+        document.getElementById('userAddress').textContent = shortAddr(addr);
+        document.getElementById('connectLabel').textContent = 'Connected';
+        document.getElementById('connectBtn').classList.remove('pulse');
+        
+        loadData();
+        startAutoRefresh();
+        setupEvents();
+        
+        setStatus('✅ Connected to Polygon!', 'success');} catch (err) {
+        console.error('Connect error:', err);
+        setStatus(`❌ ${err.message}`, 'error');
+      }
+    } 
+   
+    // ================= DATA =================
+    async function loadData() {
+      try {
+        const addr = await signer.getAddress();
+        const [income, network, basic, wallet] = await Promise.all([
+          contract.getUserIncome(addr),
+          contract.getUserNetwork(addr),
+          contract.userBasic(addr),
+          contract.userWallet(addr)
+        ]);
+        
+        document.getElementById('totalInvest').textContent = formatNum(basic[1]);
+        document.getElementById('walletBal').textContent = formatNum(wallet[0]);
+        document.getElementById('totalWithdrawn').textContent = formatNum(basic[4]);
+        document.getElementById('pendingROI').textContent = formatNum(await contract.calculatePendingROI(addr));
+        document.getElementById('sponsorInc').textContent = formatNum(income[1]);
+        document.getElementById('genInc').textContent = formatNum(income[2]);
+        document.getElementById('poolRewards').textContent = formatNum(income[3]);
+        document.getElementById('totalTeam').textContent = `Team: ${network[1]}`;
+        
+        const isFirst = basic[2].eq(0);
+        document.getElementById('investTitle').textContent = isFirst ? 'Join Network' : 'Reinvest';
+        document.getElementById('referrerInput').placeholder = isFirst ? '🔗 Referrer Address (Required)' : '🔗 Referrer (Optional)';
+        
+        if (basic[2] > 0 && !network[2]) {
+          const investTime = Number(basic[2]) * 1000;
+          const timeElapsed = Date.now() - investTime;
+          const timeLeftSeconds = Math.floor((SILVER_DEADLINE - timeElapsed) / 1000);
+          if (timeLeftSeconds > 0) showTimer(timeLeftSeconds);
+        }
+        
+        setStatus('✅ Data loaded', 'success');
+      } catch (err) {
+        console.error('Load error:', err);
+        setStatus('Data load failed: ' + err.message, 'error');
+      }
+    }
+
+    function showTimer(seconds) {
+      const card = document.getElementById('timerCard');
+      const display = document.getElementById('timerDisplay');
+      if (timerInterval) clearInterval(timerInterval);
+      card.style.display = 'block';
+      
+      function updateTimer() {
+        if (seconds <= 0) { 
+          card.style.display = 'none'; 
+          clearInterval(timerInterval); 
+          return;
+        }
+        const days = Math.floor(seconds / 86400);
+        const hours = Math.floor((seconds % 86400) / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        display.textContent = `${days}d ${hours.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        seconds--;
+      }
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+    }
+
+    async function approveIfNeeded(amountBN) {
+      try {
+        const user = await signer.getAddress();
+        const allowance = await tokenContract.allowance(user, CONTRACT_ADDRESS);
+        if (allowance.gte(amountBN)) return null;
+        
+        setStatus('🔓 Approving tokens...', '');
+        const tx = await tokenContract.approve(CONTRACT_ADDRESS, amountBN);
+        await tx.wait();
+        setStatus('✅ Approved!', 'success');
+        return tx;
+      } catch (err) {
+        throw new Error('Approval failed: ' + (err.reason || err.message));
+      }
+    }
+
+    // ✅ FIXED REFERRAL VALIDATION - NO CONTRACT CALL FOR REINVEST
+    async function validateReferrer(refAddr) {
+      if (!refAddr || refAddr === '0x0000000000000000000000000000000000000000') return true;
+      if (!ethers.utils.isAddress(refAddr)) throw new Error('Invalid address format');
+      // ✅ FOR REINVEST: Skip contract validation to avoid "Invalid address" error
+      return true;
+    }// 🔥 FIXED INVEST FUNCTION - HARDCODED CREATOR FOR REINVEST
+    async function invest() {
+      let referrer;
+      const amountInput = document.getElementById('investAmount').value;
+      const amount = parseFloat(amountInput);
+      
+      if (!amountInput || amount < 10) return alert('Min 10 AX');
+      if (amount % 10 !== 0) return alert('Multiple of 10 only');
+      disableBtn('investBtn', true);
+      setStatus('Validating...', '');
+      
+      try {
+        const addr = await signer.getAddress();
+        const basic = await contract.userBasic(addr);
+        const isFirst = basic[2].eq(0);
+        const inputReferrer = document.getElementById('referrerInput').value.trim();
+        
+        // ✅ PERFECT LOGIC
+        if (isFirst) {
+          // FIRST TIME: Referrer REQUIRED
+          if (!inputReferrer) return alert('Referrer required for first investment');
+          referrer = ethers.utils.getAddress(inputReferrer);
+          await validateReferrer(referrer);
+          if (amount < 120) throw new Error('First investment: Min 120 AX');
+        } else {
+          // REINVEST: Use HARDCODED CREATOR or input
+          if (!inputReferrer || inputReferrer === '') {
+            // ✅ HARDCODED CREATOR ADDRESS FROM CONTRACT DEPLOYER
+            referrer = "0x0000000000000000000000000000000000000000"; 
+            console.log('✅ REINVEST: Using Zero Address (Contract Default)');
+          } else {
+            referrer = ethers.utils.getAddress(inputReferrer);
+          }
+        }
+        
+        const bal = await tokenContract.balanceOf(addr);
+        const amountBN = ethers.utils.parseUnits(amount.toString(), DECIMALS);
+        if (bal.lt(amountBN)) throw new Error('Insufficient balance');
+        
+        await approveIfNeeded(amountBN);
+        
+        setStatus('🚀 Investing...', '');
+        console.log(`📝 ${isFirst ? 'FIRST' : 'REINVEST'}: Referrer=${shortAddr(referrer)}, Amount=${amount}`);
+        
+        const tx = await contract.invest(referrer, amountBN);
+        setStatus(`Tx: ${tx.hash.slice(-6)}`, 'success');
+        await tx.wait();
+        
+        setStatus('✅ Investment successful! 🎉', 'success');
+        loadData();
+        if (isFirst) document.getElementById('referrerInput').value = '';
+        
+      } catch (err) {
+        console.error('Invest error:', err);
+        setStatus('❌ ' + (err.reason || err.message), 'error');
+        alert('Error: ' + (err.reason || err.message));
+      }
+      disableBtn('investBtn', false);
+    }
+
+    async function withdraw() {
+      disableBtn('withdrawBtn', true);
+      try {
+        setStatus('💸 Withdrawing...', '');
+        const tx = await contract.withdraw();
+        await tx.wait();
+        setStatus('✅ Withdrawn successfully!', 'success');
+        loadData();
+      } catch (err) {
+        console.error('Withdraw error:', err);
+        setStatus('❌ ' + (err.reason || err.message), 'error');
+      }
+      disableBtn('withdrawBtn', false);
+    }
+
+    async function claimPools() {
+      disableBtn('claimPoolsBtn', true);
+      try {
+        setStatus('🏆 Claiming pools...', '');
+        const tx = await contract.claimPoolRewards();
+        await tx.wait();
+        setStatus('✅ Pools claimed!', 'success');
+        loadData();
+      } catch (err) {
+        console.error('Claim pools error:', err);
+        setStatus('❌ ' + (err.reason || err.message), 'error');
+      }
+      disableBtn('claimPoolsBtn', false);
+    }
+
+    async function walletWithdraw() {
+      const amount = parseFloat(document.getElementById('withdrawAmt').value);
+      if (amount < 10 || amount > 1000) return alert('10-1000 AX only');
+      
+      disableBtn('walletWithdrawBtn', true);
+      try {
+        setStatus('⚡ Fast withdraw...', '');
+        const amountBN = ethers.utils.parseUnits(amount.toString(), DECIMALS);const tx = await contract.WalletWithdraw(amountBN);
+        await tx.wait();
+        setStatus('✅ Withdrawn to wallet!', 'success');
+        loadData();
+      } catch (err) {
+        console.error('Wallet withdraw error:', err);
+        setStatus('❌ ' + (err.reason || err.message), 'error');
+      }
+      disableBtn('walletWithdrawBtn', false);
+    }
+
+    async function claimIncome() { await withdraw(); }
+    async function setMax() {
+      const addr = await signer.getAddress();
+      const bal = await tokenContract.balanceOf(addr);
+      document.getElementById('investAmount').value = formatNum(bal);
+    }
+
+    function startAutoRefresh() {
+      if (autoRefresh) clearInterval(autoRefresh);
+      autoRefresh = setInterval(loadData, REFRESH_INTERVAL);
+    }
+
+    function setupEvents() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref');
+      if (ref) document.getElementById('referrerInput').value = ref;
+
+      document.getElementById('referrerInput').addEventListener('input', async (e) => {
+        const status = document.getElementById('referrerStatus');
+        const value = e.target.value.trim();
+        if (!value) {
+          status.textContent = 'Optional for reinvest';
+          status.style.color = 'var(--muted)';
+          return;
+        }
+        try {
+          await validateReferrer(value);
+          status.textContent = '✓ Valid';
+          status.style.color = 'var(--success)';
+        } catch (err) {
+          status.textContent = '✗ Invalid';
+          status.style.color = 'var(--error)';
+        }
+      });
+
+      document.getElementById('shareBtn').addEventListener('click', async () => {
+        if (!signer) return alert('Connect wallet first');
+        try {
+          const addr = await signer.getAddress();
+          const url = `${window.location.origin}${window.location.pathname}?ref=${addr}`;
+          if (navigator.share) {
+            await navigator.share({ title: 'Join ASIAX PRO', url });
+          } else {
+            navigator.clipboard.writeText(url);
+            alert('Referral link copied!');
+          }
+        } catch (err) { alert('Share failed'); }
+      });
+
+      document.getElementById('connectBtn').onclick = connectWallet;
+      document.getElementById('investBtn').onclick = invest;
+      document.getElementById('withdrawBtn').onclick = withdraw;
+      document.getElementById('claimPoolsBtn').onclick = claimPools;
+      document.getElementById('walletWithdrawBtn').onclick = walletWithdraw;
+      document.getElementById('claimIncomeBtn').onclick = claimIncome;
+      document.getElementById('maxBtn').onclick = setMax;
+      document.getElementById('refreshBtn').onclick = loadData;
+    }
+
+    function setupBottomNav() {
+      document.getElementById('navHome').onclick = () => window.location.href = 'index.html';
+      document.getElementById('navInvest').onclick = () => window.location.href = 'index.html';
+      document.getElementById('navPools').onclick = () => window.location.href = 'index.html';
+      document.getElementById('navTeam').onclick = () => window.location.href = 'index.html';
+    }
+
+    window.addEventListener('load', () => {
+      if (window.ethereum) {
+        setStatus('✅ MetaMask Ready! Click Connect', '');
+        document.getElementById('connectBtn').classList.add('pulse');
+      } else {
+        setStatus('❌ Install MetaMask', 'error');
+      }
+      setupEvents();
+      setupBottomNav();
+    });
+
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', () => location.reload());
+      window.ethereum.on('chainChanged', () => location.reload());
+    }
+</script>
+</body>
+</html>
